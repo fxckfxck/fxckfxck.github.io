@@ -1,14 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
 import {
   getAuth,
-  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-auth.js";
 import {
   getDatabase,
   ref,
   set,
-  child,
-  get,
 } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js";
 
 // Инициализация Firebase
@@ -23,83 +22,48 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-const db = getDatabase();
 const auth = getAuth();
+const provider = new GoogleAuthProvider();
 
-var name = document.querySelector("#name");
-var email = document.querySelector("#email");
-var password = document.querySelector("#password");
-var password2 = document.querySelector("#password2");
-var registerButton = document.querySelector("#registerBut");
+// Получаем ссылку на кнопку входа через Google
+var googleLoginButton = document.querySelector("#googleLogin");
 
-function isValidname(username) {
-  return /^[a-zA-Z0-9]+$/.test(username);
-}
+googleLoginButton.addEventListener("click", () => {
+  // Входим через Google
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      // Получаем информацию о пользователе
+      const user = result.user;
+      console.log(user);
 
-function InsertData(user) {
-  var alTxt;
-  const dbref = ref(db);
-  const username = name.value;
+      // Записываем данные в Firebase Database
+      const db = getDatabase();
+      const userRef = ref(db, "Користувачі АЗС/" + user.displayName);
 
-  // Проверка, существует ли пользователь с таким логином в базе данных
-  get(child(dbref, "Користувачі АЗС/" + username))
-    .then((snapshot) => {
-      if (snapshot.exists() && username === snapshot.val().Login) {
-        alTxt = "Ой, такий логін вже зареєстровано, будь ласка оберіть інший!";
-        document.getElementById("alertText").innerHTML = alTxt;
-      } else {
-        // Запись данных о пользователе в базу данных
-        if (
-          username !== "" &&
-          email !== "" &&
-          password !== "" &&
-          password === password2 &&
-          password.length >= 6
-        ) {
-          set(ref(db, "Користувачі АЗС/" + username), {
-            Login: username,
-            Email: email,
-            Password: password,
-            Name: 0,
-            DataBuy1: password,
-            TypeGas1: 0,
-            liters1: 0,
-            Sum1: 0,
-            BonusInTable1: 0,
-            Bonus1: 0,
-            Bonus2: 0,
-            Discont: 0,
-          });
-          alTxt = "Користувач успішно зареєстрований!";
-          document.getElementById("alertText").innerHTML = alTxt;
-        } else {
-          alTxt = "Помилка, переконайтесь, що всі поля заповнені правильно!";
-          document.getElementById("alertText").innerHTML = alTxt;
-        }
-      }
-    })
-    .catch((error) => {
-      alert(error);
-    });
-}
-
-function registerUser() {
-  const emailValue = email.value;
-  const passwordValue = password.value;
-
-  // Создание пользователя с email и паролем
-  createUserWithEmailAndPassword(auth, emailValue, passwordValue)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      InsertData(user); // Вставка данных пользователя в базу данных
+      set(userRef, {
+        Login: user.displayName,
+        Email: user.email,
+        Name: 0,
+        DataBuy1: "",
+        TypeGas1: 0,
+        liters1: 0,
+        Sum1: 0,
+        BonusInTable1: 0,
+        Bonus1: 0,
+        Bonus2: 0,
+        Discont: 0,
+      })
+        .then(() => {
+          console.log("Данные пользователя записаны в базу данных");
+        })
+        .catch((error) => {
+          console.error("Ошибка записи данных:", error);
+        });
     })
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
-      console.error("Ошибка регистрации:", errorCode, errorMessage);
-      alert(errorMessage);
+      console.error("Ошибка аутентификации:", errorCode, errorMessage);
+      alert("Ошибка входа: " + errorMessage);
     });
-}
-
-registerButton.addEventListener("click", registerUser);
+});
