@@ -25,18 +25,23 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 
-// Получаем ссылку на кнопку входа через Google
-var googleLoginButton = document.querySelector("#googleLogin");
+// Получаем ссылки на элементы
+const googleLoginButton = document.querySelector("#googleLogin");
+const registrationFields = document.querySelector("#registrationFields");
+const registerButton = document.querySelector("#registerBut");
+const inputs = document.querySelectorAll(
+  "#name, #email, #password, #password2"
+);
 
+// Добавляем обработчик нажатия на кнопку Google
 googleLoginButton.addEventListener("click", () => {
-  // Входим через Google
   signInWithPopup(auth, provider)
     .then((result) => {
-      // Получаем информацию о пользователе
+      // Успешный вход
       const user = result.user;
-      console.log(user);
+      console.log("Вошёл пользователь:", user);
 
-      // Записываем данные в Firebase Database
+      // Записываем данные пользователя в базу данных
       const db = getDatabase();
       const userRef = ref(db, "Користувачі АЗС/" + user.displayName);
 
@@ -54,16 +59,19 @@ googleLoginButton.addEventListener("click", () => {
         Discont: 0,
       })
         .then(() => {
-          console.log("Данные пользователя записаны в базу данных");
+          console.log("Данные записаны в базу");
+
+          // Разблокируем поля и кнопку регистрации
+          inputs.forEach((input) => (input.disabled = false));
+          registrationFields.style.display = "block";
+          registerButton.disabled = false;
         })
         .catch((error) => {
           console.error("Ошибка записи данных:", error);
         });
     })
     .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.error("Ошибка аутентификации:", errorCode, errorMessage);
-      alert("Ошибка входа: " + errorMessage);
+      console.error("Ошибка входа:", error.message);
+      alert("Ошибка входа: " + error.message);
     });
 });
