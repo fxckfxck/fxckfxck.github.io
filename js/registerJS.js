@@ -1,5 +1,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+} from "https://www.gstatic.com/firebasejs/9.12.1/firebase-auth.js";
+import {
+  getDatabase,
+  ref,
+  set,
+} from "https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js";
 
+// Инициализация Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDQ9oYExUZ580AJ_HUbnZ0C6qot24F3yE4",
   authDomain: "firstproj-536ff.firebaseapp.com",
@@ -12,71 +22,53 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-import {
-  getDatabase,
-  ref,
-  get,
-  set,
-  child,
-  update,
-  remove,
-} from "https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js";
-
 const db = getDatabase();
+const auth = getAuth();
+
 var name = document.querySelector("#name");
 var email = document.querySelector("#email");
 var password = document.querySelector("#password");
 var password2 = document.querySelector("#password2");
 var registerButton = document.querySelector("#registerBut");
 
-function InsertData() {
+function InsertData(user) {
   var alTxt;
+
+  // Проверка, существует ли пользователь с таким логином в базе данных
   const dbref = ref(db);
-  get(child(dbref, "Користувачі АЗС/" + name.value))
+  const username = name.value;
+  get(child(dbref, "Користувачі АЗС/" + username))
     .then((snapshot) => {
-      if (snapshot.exists() && name.value == snapshot.val().Login) {
+      if (snapshot.exists() && username === snapshot.val().Login) {
         alTxt = "Ой, такий логін вже зареєстровано, будь ласка оберіть інший!";
         document.getElementById("alertText").innerHTML = alTxt;
       } else {
+        // Запись данных о пользователе в базу данных
         if (
-          password.value == password2.value &&
-          password.value != null &&
-          password.value.length >= 6
+          username !== "" &&
+          email !== "" &&
+          password !== "" &&
+          password === password2 &&
+          password.length >= 6
         ) {
-          if (name.value != null && name.value != "") {
-            if (email.value != null && email.value != "") {
-              if (isValidname(name.value)) {
-                set(ref(db, "Користувачі АЗС/" + name.value), {
-                  Login: name.value,
-                  Email: email.value,
-                  Password: password.value,
-                  Name: 0,
-                  DataBuy1: password.value,
-                  TypeGas1: 0,
-                  liters1: 0,
-                  Sum1: 0,
-                  BonusInTable1: 0,
-                  Bonus1: 0,
-                  Bonus2: 0,
-                  Discont: 0,
-                });
-                alTxt = "Користувач успішно зареєстрований";
-                document.getElementById("alertText").innerHTML = alTxt;
-              } else {
-                alTxt =
-                  'Помилка, ви маєте правильно заповнити поле "Логін" (лише символи A-z A-Z та 0-9)';
-                document.getElementById("alertText").innerHTML = alTxt;
-              }
-            } else {
-              alTxt = 'Помилка, ви маєте заповнити поле "Пошта"';
-              document.getElementById("alertText").innerHTML = alTxt;
-            }
-          } else {
-            alTxt = "Помилка, ви маєте заповнити поле Логін";
-            document.getElementById("alertText").innerHTML = alTxt;
-          }
+          set(ref(db, "Користувачі АЗС/" + username), {
+            Login: username,
+            Email: email,
+            Password: password,
+            Name: 0,
+            DataBuy1: password,
+            TypeGas1: 0,
+            liters1: 0,
+            Sum1: 0,
+            BonusInTable1: 0,
+            Bonus1: 0,
+            Bonus2: 0,
+            Discont: 0,
+          });
+          alTxt = "Користувач успішно зареєстрований!";
+          document.getElementById("alertText").innerHTML = alTxt;
         } else {
-          alTxt = "Помилка, пароль не співпадає або містить меньше 6 символів!";
+          alTxt = "Помилка, переконайтесь, що всі поля заповнені правильно!";
           document.getElementById("alertText").innerHTML = alTxt;
         }
       }
@@ -86,8 +78,26 @@ function InsertData() {
     });
 }
 
+function registerUser() {
+  const emailValue = email.value;
+  const passwordValue = password.value;
+
+  // Создание пользователя с email и паролем
+  createUserWithEmailAndPassword(auth, emailValue, passwordValue)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      InsertData(user); // Вставка данных пользователя в базу данных
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error("Ошибка регистрации:", errorCode, errorMessage);
+      alert(errorMessage);
+    });
+}
+
+registerButton.addEventListener("click", registerUser);
+
 function isValidname(username) {
   return /^[a-zA-Z0-9]+$/.test(username);
 }
-
-registerButton.addEventListener("click", InsertData);
