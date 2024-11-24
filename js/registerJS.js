@@ -8,7 +8,7 @@ import {
   ref,
   set,
   child,
-  get, // Необходимо импортировать функцию `get`
+  get,
 } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js";
 
 // Инициализация Firebase
@@ -33,13 +33,17 @@ var password = document.querySelector("#password");
 var password2 = document.querySelector("#password2");
 var registerButton = document.querySelector("#registerBut");
 
+function isValidname(username) {
+  return /^[a-zA-Z0-9]+$/.test(username);
+}
+
 function InsertData(user) {
   var alTxt;
-
-  // Проверка, существует ли пользователь с таким логином в базе данных
   const dbref = ref(db);
   const username = name.value;
-  get(child(dbref, "Користувачі АЗС/" + username)) // Здесь используется get
+
+  // Проверка, существует ли пользователь с таким логином в базе данных
+  get(child(dbref, "Користувачі АЗС/" + username))
     .then((snapshot) => {
       if (snapshot.exists() && username === snapshot.val().Login) {
         alTxt = "Ой, такий логін вже зареєстровано, будь ласка оберіть інший!";
@@ -99,7 +103,3 @@ function registerUser() {
 }
 
 registerButton.addEventListener("click", registerUser);
-
-function isValidname(username) {
-  return /^[a-zA-Z0-9]+$/.test(username);
-}
