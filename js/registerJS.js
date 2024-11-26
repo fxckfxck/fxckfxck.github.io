@@ -25,31 +25,25 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
 
-// Получаем ссылки на элементы
-const googleLoginButton = document.querySelector("#googleLogin");
-const registrationFields = document.querySelector("#registrationFields");
-const registerButton = document.querySelector("#registerBut");
-const inputs = document.querySelectorAll(
-  "#name, #email, #password, #password2"
-);
+// Получаем ссылку на кнопку входа через Google
+var googleLoginButton = document.querySelector("#googleLogin");
 
-// Добавляем обработчик нажатия на кнопку Google
 googleLoginButton.addEventListener("click", () => {
+  // Входим через Google
   signInWithPopup(auth, provider)
     .then((result) => {
-      // Успешный вход
+      // Получаем информацию о пользователе
       const user = result.user;
-      console.log("Вошёл пользователь:", user);
+      console.log(user);
 
-      // Записываем данные пользователя в базу данных
+      // Записываем данные в Firebase Database
       const db = getDatabase();
       const userRef = ref(db, "Користувачі АЗС/" + user.displayName);
 
       set(userRef, {
         Login: user.displayName,
         Email: user.email,
-        Name: 0,
-        DataBuy1: "",
+        DataBuy1: 0,
         TypeGas1: 0,
         liters1: 0,
         Sum1: 0,
@@ -59,19 +53,16 @@ googleLoginButton.addEventListener("click", () => {
         Discont: 0,
       })
         .then(() => {
-          console.log("Данные записаны в базу");
-
-          // Разблокируем поля и кнопку регистрации
-          inputs.forEach((input) => (input.disabled = false));
-          registrationFields.style.display = "block";
-          registerButton.disabled = false;
+          console.log("Данные пользователя записаны в базу данных");
         })
         .catch((error) => {
           console.error("Ошибка записи данных:", error);
         });
     })
     .catch((error) => {
-      console.error("Ошибка входа:", error.message);
-      alert("Ошибка входа: " + error.message);
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error("Ошибка аутентификации:", errorCode, errorMessage);
+      alert("Ошибка входа: " + errorMessage);
     });
 });

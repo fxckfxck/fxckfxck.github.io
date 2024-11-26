@@ -124,3 +124,21 @@ body {
 .my-5 {
   margin-bottom: 1rem !important;
 }
+
+#chatbot {
+  width: 300px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+#chat-window {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+#messages {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}

@@ -287,6 +287,17 @@
                 >Перейти до магазину</a
               >
             </p>
+            <div id="chatbot">
+              <div id="chat-window">
+                <div id="messages"></div>
+              </div>
+              <input
+                type="text"
+                id="user-input"
+                placeholder="Введите ваш вопрос"
+              />
+              <button id="send-button">Отправить</button>
+            </div>
           </div>
         </div>
       </div>
@@ -308,6 +319,41 @@
         alTxt = "Ваша ціна: " + Resssult + " гривень";
         document.getElementById("resultGas").innerHTML = alTxt;
       }
+    </script>
+
+    <script>
+      document
+        .getElementById("send-button")
+        .addEventListener("click", async () => {
+          const userInput = document.getElementById("user-input").value;
+
+          // Отображение запроса пользователя
+          const messagesDiv = document.getElementById("messages");
+          messagesDiv.innerHTML += `<div>Вы: ${userInput}</div>`;
+
+          // Отправка запроса к API ChatGPT
+          const response = await fetch(
+            "https://api.openai.com/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer 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`,
+              },
+              body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [{ role: "user", content: userInput }],
+              }),
+            }
+          );
+
+          const responseData = await response.json();
+          const botMessage = responseData.choices[0].message.content;
+
+          // Отображение ответа бота
+          messagesDiv.innerHTML += `<div>Бот: ${botMessage}</div>`;
+          document.getElementById("user-input").value = ""; // Очистка ввода
+        });
     </script>
   </body>
 </html>

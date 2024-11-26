@@ -139,7 +139,7 @@ main {
   font-weight: 500;
   font-size: 20px;
   line-height: 23px;
-  margin-bottom: 38px;
+  /*margin-bottom: 38px;*/
 }
 
 .form-fields {
@@ -205,7 +205,16 @@ a {
   color: #405d87;
   padding-top: 15px;
   text-decoration: none;
-  /* padding-bottom: 15px; */
+  padding-bottom: 15px;
+}
+
+.onSecondtPage {
+  font-weight: 500;
+  font-size: 14px;
+  color: #405d87;
+  /*  padding-top: 15px;*/
+  text-decoration: none;
+  padding-bottom: 30px;
 }
 
 .onFirstPage:hover {
@@ -219,4 +228,30 @@ a {
 .newPforModal {
   padding: 0em;
   margin: 0%;
+}
+
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 45px;
+  width: 100%;
+  background-color: #fff;
+  border: 2px solid #e9f2ff;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #3b5983;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.google-button:hover {
+  background-color: #f1f5fe;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.google-logo {
+  height: 20px;
+  margin-right: 10px;
 }
