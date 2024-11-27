@@ -293,7 +293,7 @@
           <h1>TON Wallet Integration</h1>
 
           <!-- Кнопка для подключения кошелька -->
-          <div id="connect-button">Подключить кошелекк</div>
+          <div id="connect-button">Подключить кошелекsaк</div>
 
           <!-- Кнопка для отправки транзакции -->
           <button onclick="transaction()">Отправить транзакцию</button>
@@ -337,7 +337,7 @@
           ],
         };
         try {
-          await TonConnectUI.sendTransaction(transaction);
+          await tonConnectUI.sendTransaction(transaction);
         } catch (e) {
           console.error(e);
         }
