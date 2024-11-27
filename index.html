@@ -293,10 +293,10 @@
           <h1>TON Wallet Integration</h1>
 
           <!-- Кнопка для подключения кошелька -->
-          <div id="connect-button">Подключить кошелеккккыs</div>
+          <div id="connect-button">Подключить кошелеккккыsas</div>
 
           <!-- Кнопка для отправки транзакции -->
-          <div id="send-transaction" disabled>Отправить транзакцию</div>
+          <button onclick="transaction">Отправить транзакцию</button>
         </div>
       </div>
     </div>
@@ -325,6 +325,23 @@
         manifestUrl: "https://fxckfxck.github.io/tonconnect-manifest.json",
         buttonRootId: "connect-button",
       });
+
+      async function transaction() {
+        const transaction = {
+          validUntil: Math.round(Date.now() / 1000) + 10,
+          messages: [
+            {
+              adress: "UQDPFf6Y-HI_n0l5JhlKaA3McTgmx0LeeYhb4KC1pQUnE1cc",
+              amount: "10000000",
+            },
+          ],
+        };
+        try {
+          await TonConnectUI.sendTransaction(transaction);
+        } catch (e) {
+          console.error(e);
+        }
+      }
     </script>
   </body>
 </html>
