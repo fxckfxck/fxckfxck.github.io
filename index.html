@@ -5,6 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Головна AERO-OIL</title>
+    <script
+      src="https://unpkg.com/@tonconnect/ui@0.0.9/dist/tonconnect-ui.min.js"
+      defer
+    ></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -321,58 +325,9 @@
       import { TonConnect } from "@tonconnect/sdk"; // Импортируем SDK
 
       // Инициализируем TonConnect
-      const tonConnect = new TonConnect();
-
-      // Ссылка на кнопки
-      const connectButton = document.getElementById("connect-button");
-      const sendTransactionButton = document.getElementById("send-transaction");
-
-      // Функция подключения кошелька
-      connectButton.addEventListener("click", async () => {
-        try {
-          // Подключаем кошелек
-          await tonConnect.connectWallet();
-
-          // Показываем данные подключенного кошелька
-          const walletInfo = tonConnect.wallet;
-          console.log("Кошелек подключен:", walletInfo);
-
-          // Активируем кнопку транзакции
-          sendTransactionButton.disabled = false;
-          alert("Кошелек успешно подключен!");
-        } catch (error) {
-          console.error("Ошибка подключения:", error);
-          alert("Не удалось подключить кошелек");
-        }
-      });
-
-      // Функция отправки транзакции
-      sendTransactionButton.addEventListener("click", async () => {
-        try {
-          if (!tonConnect.connected) {
-            throw new Error("Кошелек не подключен");
-          }
-
-          // Формируем транзакцию
-          const transactionPayload = {
-            validUntil: Math.floor(Date.now() / 1000) + 3600, // Время действия (1 час)
-            messages: [
-              {
-                address: "EQC2...Ваш_адрес_получателя...", // Укажите адрес получателя
-                amount: "1000000000", // Сумма в нанотонах (1 TON = 1e9)
-              },
-            ],
-          };
-
-          // Отправляем транзакцию
-          const response = await tonConnect.sendTransaction(transactionPayload);
-          console.log("Транзакция отправлена:", response);
-
-          alert("Транзакция успешно отправлена!");
-        } catch (error) {
-          console.error("Ошибка транзакции:", error);
-          alert("Не удалось отправить транзакцию");
-        }
+      const tonConnect = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: "https://fxckfxck.github.io.tonconnect-manifest.json",
+        buttonRootId: "connect-button",
       });
     </script>
   </body>
