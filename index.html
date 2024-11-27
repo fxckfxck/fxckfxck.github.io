@@ -9,6 +9,7 @@
       src="https://unpkg.com/@tonconnect/ui@0.0.9/dist/tonconnect-ui.min.js"
       defer
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/ui@latest/tonconnect-ui.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -295,7 +296,7 @@
           <h1>TON Wallet Integration</h1>
 
           <!-- Кнопка для подключения кошелька -->
-          <button id="connect-button">Подключить кошелек</button>
+          <button id="connect-button">Подключить кошелекккк</button>
 
           <!-- Кнопка для отправки транзакции -->
           <button id="send-transaction" disabled>Отправить транзакцию</button>
@@ -326,8 +327,31 @@
 
       // Инициализируем TonConnect
       const tonConnect = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: "https://fxckfxck.github.io.tonconnect-manifest.json",
-        buttonRootId: "connect-button",
+        manifestUrl: "https://fxckfxck.github.io/tonconnect-manifest.json",
+      });
+
+      // Привязка обработчика к кнопке
+      const connectButton = document.getElementById("connect-button");
+      connectButton.addEventListener("click", async () => {
+        try {
+          // Вызов подключения TonConnect
+          await tonConnect.connectWallet();
+
+          // Получение данных кошелька
+          const walletInfo = tonConnect.wallet;
+          console.log("Кошелек подключен:", walletInfo);
+
+          // Уведомление о подключении
+          alert("Кошелек успешно подключен! Адрес: " + walletInfo.address);
+        } catch (error) {
+          console.error("Ошибка подключения:", error);
+          alert("Не удалось подключить кошелек. Проверьте настройки.");
+        }
+      });
+
+      // Событие изменения статуса подключения
+      tonConnect.onStatusChange((status) => {
+        console.log("Статус подключения:", status);
       });
     </script>
   </body>
