@@ -319,29 +319,31 @@
       }
     </script>
 
-    <script>
-      // Инициализируем TonConnect
-      const tonConnect = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: "https://fxckfxck.github.io/tonconnect-manifest.json",
-        buttonRootId: "connect-button",
-      });
+<script>
+  // Инициализируем TonConnect
+  const tonConnect = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: "https://fxckfxck.github.io/tonconnect-manifest.json",
+    buttonRootId: "connect-button",
+  });
 
-      async function transaction() {
-        const transaction = {
-          validUntil: Math.round(Date.now() / 1000) + 10,
-          messages: [
-            {
-              adress: "UQDPFf6Y-HI_n0l5JhlKaA3McTgmx0LeeYhb4KC1pQUnE1cc",
-              amount: "10000000",
-            },
-          ],
-        };
-        try {
-          await tonConnectUI.sendTransaction(transaction);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    </script>
+  async function transaction() {
+    const transactionData = {
+      validUntil: Math.round(Date.now() / 1000) + 10,
+      messages: [
+        {
+          address: "UQDPFf6Y-HI_n0l5JhlKaA3McTgmx0LeeYhb4KC1pQUnE1cc", // Убедитесь, что адрес корректен
+          amount: "10000000", // Сумма в нанотонах
+        },
+      ],
+    };
+
+    try {
+      await tonConnect.sendTransaction(transactionData); // Используем корректный экземпляр
+      console.log("Транзакция успешно отправлена!");
+    } catch (error) {
+      console.error("Ошибка при отправке транзакции:", error);
+    }
+  }
+</script>
   </body>
 </html>
