@@ -287,18 +287,14 @@
                 >Перейти до магазину</a
               >
             </p>
-            <div id="chatbot">
-              <div id="chat-window">
-                <div id="messages"></div>
-              </div>
-              <input
-                type="text"
-                id="user-input"
-                placeholder="Введите ваш вопрос"
-              />
-              <button id="send-button">Отправить</button>
-            </div>
           </div>
+          <h1>TON Wallet Integration</h1>
+
+          <!-- Кнопка для подключения кошелька -->
+          <button id="connect-button">Подключить кошелек</button>
+
+          <!-- Кнопка для отправки транзакции -->
+          <button id="send-transaction" disabled>Отправить транзакцию</button>
         </div>
       </div>
     </div>
@@ -322,38 +318,62 @@
     </script>
 
     <script>
-      document
-        .getElementById("send-button")
-        .addEventListener("click", async () => {
-          const userInput = document.getElementById("user-input").value;
+      import { TonConnect } from "@tonconnect/sdk"; // Импортируем SDK
 
-          // Отображение запроса пользователя
-          const messagesDiv = document.getElementById("messages");
-          messagesDiv.innerHTML += `<div>Вы: ${userInput}</div>`;
+      // Инициализируем TonConnect
+      const tonConnect = new TonConnect();
 
-          // Отправка запроса к API ChatGPT
-          const response = await fetch(
-            "https://api.openai.com/v1/chat/completions",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer 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`,
+      // Ссылка на кнопки
+      const connectButton = document.getElementById("connect-button");
+      const sendTransactionButton = document.getElementById("send-transaction");
+
+      // Функция подключения кошелька
+      connectButton.addEventListener("click", async () => {
+        try {
+          // Подключаем кошелек
+          await tonConnect.connectWallet();
+
+          // Показываем данные подключенного кошелька
+          const walletInfo = tonConnect.wallet;
+          console.log("Кошелек подключен:", walletInfo);
+
+          // Активируем кнопку транзакции
+          sendTransactionButton.disabled = false;
+          alert("Кошелек успешно подключен!");
+        } catch (error) {
+          console.error("Ошибка подключения:", error);
+          alert("Не удалось подключить кошелек");
+        }
+      });
+
+      // Функция отправки транзакции
+      sendTransactionButton.addEventListener("click", async () => {
+        try {
+          if (!tonConnect.connected) {
+            throw new Error("Кошелек не подключен");
+          }
+
+          // Формируем транзакцию
+          const transactionPayload = {
+            validUntil: Math.floor(Date.now() / 1000) + 3600, // Время действия (1 час)
+            messages: [
+              {
+                address: "EQC2...Ваш_адрес_получателя...", // Укажите адрес получателя
+                amount: "1000000000", // Сумма в нанотонах (1 TON = 1e9)
               },
-              body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                messages: [{ role: "user", content: userInput }],
-              }),
-            }
-          );
+            ],
+          };
 
-          const responseData = await response.json();
-          const botMessage = responseData.choices[0].message.content;
+          // Отправляем транзакцию
+          const response = await tonConnect.sendTransaction(transactionPayload);
+          console.log("Транзакция отправлена:", response);
 
-          // Отображение ответа бота
-          messagesDiv.innerHTML += `<div>Бот: ${botMessage}</div>`;
-          document.getElementById("user-input").value = ""; // Очистка ввода
-        });
+          alert("Транзакция успешно отправлена!");
+        } catch (error) {
+          console.error("Ошибка транзакции:", error);
+          alert("Не удалось отправить транзакцию");
+        }
+      });
     </script>
   </body>
 </html>
