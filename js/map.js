@@ -161,7 +161,6 @@ function showTheMap(pos1, pos2) {
     Kharkiv6,
   ]);
   var stationKyiv = L.layerGroup([Kyiv1, Kyiv2, Kyiv3, Kyiv4]);
-  // Слои станций с разными типами топлива
   var gasStations = L.layerGroup([Kharkiv1, Kharkiv2, Kharkiv3, Kharkiv4]);
   var dieselStations = L.layerGroup([Kharkiv3, Kharkiv5, Kharkiv6]);
   var gasolineStations = L.layerGroup([Kharkiv5, Kharkiv6]);
@@ -173,10 +172,6 @@ function showTheMap(pos1, pos2) {
         "В наявності А95, А92": gasStations,
         "В наявності Дизель": dieselStations,
         "В наявності Газ": gasolineStations,
-      };
-      // Категория топлива
-      var dopLayers = {
-        "Станції міста Київ": stationKyiv,
       };
 
       // Добавляем слой "Харьков" по умолчанию

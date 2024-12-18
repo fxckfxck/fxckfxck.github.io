@@ -24,7 +24,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const provider = new GoogleAuthProvider();
-
+var password = document.querySelector("#password");
 // Получаем ссылку на кнопку входа через Google
 var googleLoginButton = document.querySelector("#googleLogin");
 
@@ -43,6 +43,7 @@ googleLoginButton.addEventListener("click", () => {
       set(userRef, {
         Login: user.displayName,
         Email: user.email,
+        Password: password.value,
         DataBuy1: 0,
         TypeGas1: 0,
         liters1: 0,

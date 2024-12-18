@@ -89,9 +89,6 @@
             <li class="nav-item">
               <a class="nav-link" href="market.html">Магазин</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="sto.html">Послуги СТО</a>
-            </li>
           </ul>
         </div>
       </div>
@@ -126,7 +123,7 @@
                 Реєструйтеся та отримуйте знижки, аналізуйте витрати та
                 виконуйте активності для отримання бонусів.
               </p>
-              <a href="map_choose.html" class="btn btn-primary btnPrim2"
+              <a href="validation.html" class="btn btn-primary btnPrim2"
                 >Детальніше</a
               >
             </div>
@@ -290,13 +287,6 @@
               >
             </p>
           </div>
-          <h1>TON Wallet Integration</h1>
-
-          <!-- Кнопка для подключения кошелька -->
-          <div id="connect-button">Подключить кошелекsaк</div>
-
-          <!-- Кнопка для отправки транзакции -->
-          <button onclick="transaction()">Отправить транзакциююю</button>
         </div>
       </div>
     </div>
@@ -318,32 +308,5 @@
         document.getElementById("resultGas").innerHTML = alTxt;
       }
     </script>
-
-<script>
-  // Инициализируем TonConnect
-  const tonConnect = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: "https://fxckfxck.github.io/tonconnect-manifest.json",
-    buttonRootId: "connect-button",
-  });
-
-  async function transaction() {
-    const transactionData = {
-      validUntil: Math.round(Date.now() / 1000) + 10,
-      messages: [
-        {
-          address: "UQDPFf6Y-HI_n0l5JhlKaA3McTgmx0LeeYhb4KC1pQUnE1cc", // Убедитесь, что адрес корректен
-          amount: "10000000", // Сумма в нанотонах
-        },
-      ],
-    };
-
-    try {
-      await tonConnect.sendTransaction(transactionData); // Используем корректный экземпляр
-      console.log("Транзакция успешно отправлена!");
-    } catch (error) {
-      console.error("Ошибка при отправке транзакции:", error);
-    }
-  }
-</script>
   </body>
 </html>
