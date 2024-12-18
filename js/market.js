@@ -13,41 +13,106 @@ function showCategory(categoryId) {
   event.target.classList.add("active");
 }
 
-let cart = [];
-let cartCount = 0;
+document.addEventListener("DOMContentLoaded", () => {
+  const cartItemsContainer = document.getElementById("cart-items");
+  let cart = []; // Массив для хранения товаров в корзине
 
-function addToCart(id, name, price) {
-  // Добавляем товар в массив корзины
-  cart.push({ id, name, price });
-  cartCount++;
-  document.getElementById("cart-count").innerText = cartCount;
+  // Функция добавления товара в корзину
+  function addToCart(id, name, price) {
+    const existingItem = cart.find((item) => item.id === id);
 
-  // Показываем уведомление
-  showNotification(`${name} добавлен в корзину!`);
-}
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.push({ id, name, price: parseFloat(price), quantity: 1 });
+    }
 
-function showNotification(message) {
-  const notification = document.getElementById("notification");
-  notification.innerText = message;
-  notification.classList.add("show");
+    renderCart();
+  }
 
-  setTimeout(() => {
-    notification.classList.remove("show");
-  }, 3000);
-}
+  // Функция отображения корзины
+  function renderCart() {
+    cartItemsContainer.innerHTML = "";
 
-function redirectToCart() {
-  // Логика перехода на страницу корзины
-  console.log("Переход в корзину: ", cart);
-  window.location.href = "cart.html";
-}
+    if (cart.length === 0) {
+      cartItemsContainer.innerHTML = "<p>Ваша корзина порожня.</p>";
+      return;
+    }
 
-// Навешиваем обработчики событий на кнопки "Купить"
-document.querySelectorAll(".buy-btn").forEach((button) => {
-  button.addEventListener("click", () => {
-    const id = button.dataset.id;
-    const name = button.dataset.name;
-    const price = button.dataset.price;
-    addToCart(id, name, price);
+    cart.forEach((item, index) => {
+      const cartItem = document.createElement("div");
+      cartItem.classList.add("cart-item");
+
+      cartItem.innerHTML = `
+        <span class="item-name">${item.name}</span>
+        <span class="item-price">₴${(item.price * item.quantity).toFixed(
+          2
+        )}</span>
+        <div>
+          <input
+            type="number"
+            class="item-quantity"
+            min="1"
+            value="${item.quantity}"
+            data-index="${index}"
+          />
+          <button class="remove-item" data-index="${index}">Видалити</button>
+        </div>
+      `;
+
+      cartItemsContainer.appendChild(cartItem);
+    });
+
+    // Обновляем события для изменения количества и удаления
+    attachCartEvents();
+  }
+
+  // Функция для привязки событий к элементам корзины
+  function attachCartEvents() {
+    const quantityInputs = document.querySelectorAll(".item-quantity");
+    const removeButtons = document.querySelectorAll(".remove-item");
+
+    quantityInputs.forEach((input) => {
+      input.addEventListener("change", (e) => {
+        const index = e.target.dataset.index;
+        const newQuantity = parseInt(e.target.value);
+
+        if (newQuantity > 0) {
+          cart[index].quantity = newQuantity;
+          renderCart();
+        }
+      });
+    });
+
+    removeButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const index = e.target.dataset.index;
+        cart.splice(index, 1);
+        renderCart();
+      });
+    });
+  }
+
+  // Открытие корзины (кнопка "Оформити замовлення")
+  window.openCheckout = function () {
+    if (cart.length === 0) {
+      alert("Корзина порожня! Додайте товари, щоб оформити замовлення.");
+      return;
+    }
+
+    console.log("Ваше замовлення:", cart);
+    alert("Ваше замовлення відправлено. Дякуємо за покупку!");
+    cart = []; // Очищаем корзину
+    renderCart();
+  };
+
+  // Навешиваем события на кнопки "Купити"
+  document.querySelectorAll(".buy-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.id;
+      const name = button.dataset.name;
+      const price = button.dataset.price;
+      addToCart(id, name, price);
+    });
   });
 });
