@@ -1,5 +1,19 @@
+// Импорты Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "https://www.gstatic.com/firebasejs/9.12.1/firebase-auth.js";
+import {
+  getDatabase,
+  ref,
+  get,
+  set,
+  child,
+} from "https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js";
 
+// Конфигурация Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDQ9oYExUZ580AJ_HUbnZ0C6qot24F3yE4",
   authDomain: "firstproj-536ff.firebaseapp.com",
@@ -10,81 +24,69 @@ const firebaseConfig = {
   appId: "1:812751731917:web:2e215c1562146bed7c7d84",
 };
 
+// Инициализация Firebase
 const app = initializeApp(firebaseConfig);
-
-import {
-  getDatabase,
-  ref,
-  get,
-  set,
-  child,
-  update,
-  remove,
-} from "https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js";
-
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
 const db = getDatabase();
-var name = document.querySelector("#name");
-var password = document.querySelector("#password");
-var bool1 = false;
-var findBtn = document.querySelector("#find");
-var okbut = document.querySelector("#okbut");
 
-function FindData() {
-  var alTxt;
-  const dbref = ref(db);
+// Получение элементов DOM
+const googleLoginButton = document.querySelector("#googleLogin");
+const alertText = document.getElementById("alertText");
 
-  get(child(dbref, "Користувачі АЗС/" + name.value))
-    .then((snapshot) => {
-      if (
-        snapshot.exists() &&
-        name.value == snapshot.val().Login &&
-        name.value != null &&
-        name.value != "" &&
-        password.value == snapshot.val().Password &&
-        password.value != null &&
-        password.value != ""
-      ) {
-        //sessionStorage.setItem("Login", snapshot.val().Login);
-        //sessionStorage.setItem("Email", snapshot.val().Email);
-        //sessionStorage.setItem("Password", snapshot.val().Password);
-        //sessionStorage.setItem("BuyA95", snapshot.val().BuyA95);
-        //sessionStorage.setItem("BuyA92", snapshot.val().BuyA92);
-        //sessionStorage.setItem("BuyDiesel", snapshot.val().BuyDiesel);
-        //sessionStorage.setItem("BuyGas", snapshot.val().BuyGas);
-        //sessionStorage.setItem("Discont", snapshot.val().Discont);
-        //sessionStorage.setItem("Bonus1", snapshot.val().Bonus1);
-        //sessionStorage.setItem("Bonus2", snapshot.val().Bonus2);
-        //sessionStorage.setItem("Name", snapshot.val().Name);
-        //sessionStorage.setItem("OrderSum", snapshot.val().OrderSum);
-        sessionStorage.setItem("Login", snapshot.val().Login);
-        sessionStorage.setItem("Email", snapshot.val().Email);
-        sessionStorage.setItem("Password", snapshot.val().Password);
-        sessionStorage.setItem("Name", snapshot.val().Name);
-        sessionStorage.setItem("DataBuy1", snapshot.val().DataBuy1);
-        sessionStorage.setItem("TypeGas1", snapshot.val().TypeGas1);
-        sessionStorage.setItem("liters1", snapshot.val().liters1);
-        sessionStorage.setItem("Sum1", snapshot.val().Sum1);
-        sessionStorage.setItem("BonusInTable1", snapshot.val().BonusInTable1);
-        sessionStorage.setItem("Bonus1", snapshot.val().Bonus1);
-        sessionStorage.setItem("Bonus2", snapshot.val().Bonus2);
-        sessionStorage.setItem("Discont", snapshot.val().Discont);
-        bool1 = true;
-        alTxt = "Вхід виконано.";
-        document.getElementById("alertText").innerHTML = alTxt;
-      } else {
-        alTxt = "Нічого не знайдено!";
-        document.getElementById("alertText").innerHTML = alTxt;
-      }
+// Функция аутентификации через Google
+function authenticateWithGoogle() {
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      // Пользователь успешно аутентифицирован
+      const user = result.user;
+
+      // Проверяем пользователя в базе данных
+      verifyUserInDatabase(user)
+        .then((isNewUser) => {
+          if (isNewUser) {
+            alertText.innerHTML =
+              "Вхід виконано. Новий користувач доданий у базу.";
+          } else {
+            alertText.innerHTML = "Вхід виконано. Користувач існує у базі.";
+          }
+        })
+        .catch((error) => {
+          console.error("Ошибка проверки пользователя в базе:", error);
+          alertText.innerHTML = "Сталася помилка: " + error.message;
+        });
     })
     .catch((error) => {
-      alert(error);
+      console.error("Ошибка аутентификации:", error);
+      alertText.innerHTML = "Помилка входу: " + error.message;
     });
 }
 
-function OkBut() {
-  if (bool1 == true) {
-    window.open("personal_cabinet.html", "_self");
-  }
+// Функция проверки или добавления пользователя в базу данных
+function verifyUserInDatabase(user) {
+  return new Promise((resolve, reject) => {
+    const userRef = ref(db, "Користувачі АЗС/" + user.uid);
+
+    get(userRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          // Пользователь существует
+          resolve(false);
+        } else {
+          // Новый пользователь, добавляем в базу
+          set(userRef, {
+            Login: user.displayName,
+            Email: user.email,
+            UID: user.uid,
+            CreatedAt: new Date().toISOString(),
+          })
+            .then(() => resolve(true))
+            .catch((error) => reject(error));
+        }
+      })
+      .catch((error) => reject(error));
+  });
 }
-findBtn.addEventListener("click", FindData);
-okbut.addEventListener("click", OkBut);
+
+// Привязка события к кнопке входа через Google
+googleLoginButton.addEventListener("click", authenticateWithGoogle);
