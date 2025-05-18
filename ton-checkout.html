@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Оплата через TON</title>
+    <link rel="stylesheet" href="css/stylesTonConnect.css" />
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  </head>
+  <body>
+    <div class="payment-container">
+      <h1>💳 Оплатити онлайн замовлення</h1>
+      <p class="amount">Сума до сплати: <strong>₴100.00</strong></p>
+
+      <div id="connect-button" class="ton-button">Підключити гаманець</div>
+
+      <div id="wallet-info" class="wallet-info hidden">
+        <p>🔗 Адреса: <span id="wallet-address"></span></p>
+        <p>💰 TON: <span id="ton-balance">—</span></p>
+        <p>💵 USDT: <span id="usdt-balance">—</span></p>
+      </div>
+
+      <button id="pay-button" class="ton-button hidden">Оплатити</button>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
